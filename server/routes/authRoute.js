@@ -1,6 +1,7 @@
-const { getOne, createUser, getUsers } = require('../controllers/user')
+const { getOne, createUser, getUsers, getUserById } = require('../controllers/user')
 const bcrypt = require('bcryptjs')
 const { generateToken } = require('../utils/generateToken')
+const verifyToken = require('../middleware/verifyToken')
 const router = require('express').Router()
 
 router.post('/register',async(req,res)=>{
@@ -83,5 +84,21 @@ router.get('/logout',async(req,res)=>{
         return res.status(500).json({message:"something went wrong",data:error})
     }
 })
+
+
+//current user 
+
+
+router.get('/me',verifyToken, async(req,res)=>{
+
+    try {
+        const user = await getUserById({_id:req.user})
+               
+        return res.status(200).json({message:"user fetched",user})
+    } catch (error) {
+        return res.status(500).json({message:"something went wrong",data:error})
+    }
+})
+
 
 module.exports = router
